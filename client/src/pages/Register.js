@@ -8,6 +8,8 @@ import CountryData from "./CountryData";
 import { useNavigate, useLocation } from "react-router-dom";
 const Register = ({ setSubmitted }) => {
   const [bool,setBool]=useState(false)
+  //const [bool, setBool] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [nameError, setNameError] = useState("");
@@ -26,12 +28,12 @@ const Register = ({ setSubmitted }) => {
   const graduation = useRef();
   const course = useRef();
 
-  useEffect(() => {
-    if (emailFromState) {
-      email.current.value = emailFromState;
-    }
+  // useEffect(() => {
+  //   if (emailFromState) {
+  //     email.current.value = emailFromState;
+  //   }
     
-  }, [emailFromState]); 
+  // }, [emailFromState]);
 
 
   const validateName = (name) => {
@@ -159,31 +161,26 @@ const Register = ({ setSubmitted }) => {
       //console.log(inputData);
     }
   };
-  if (bool){
-    const sendOtp = async () => {
-      if (email.current && email.current.value) {
-        const data = {
-          email: email.current.value,
-        };
-    
-        try {
-          const response1 = await sentOtpFunction(data);
-    
-          if (response1.status === 200) {
-            navigate("/user/register", { state: email.current.value });
-          } else {
-            console.log(data);
-          }
-        } catch (error) {
-          console.error("Error sending OTP:", error);
-        }
+  useEffect(() => {
+    if (bool && !otpSent) {
+      sendOtp();
+      console.log(bool);
+    }
+  }, [bool, otpSent]);
+
+  const sendOtp = async () => {
+    try {
+      const response1 = await sentOtpFunction({ email: email.current.value });
+      if (response1.status === 200) {
+        setOtpSent(true);
+        navigate("/user/register", { state: email.current.value });
       } else {
-        console.error("Email ref is null or email value is empty.");
+        console.error("Error sending OTP:", response1.data.error);
       }
-      
-    };
-    sendOtp();
-  }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+    }
+  };
    
 
 
