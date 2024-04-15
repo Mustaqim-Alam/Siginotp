@@ -30,14 +30,9 @@ const Register = ({ setSubmitted }) => {
     if (emailFromState) {
       email.current.value = emailFromState;
     }
-    sendOtp();
+    
   }, [emailFromState]); 
 
-  useEffect(() => {
-    if (emailFromState) {
-      email.current.value = emailFromState;
-    }
-  }, [emailFromState]);
 
   const validateName = (name) => {
     if (!name.trim()) {
@@ -155,7 +150,7 @@ const Register = ({ setSubmitted }) => {
       setBool(true)
       toast.success("Registration successful!");
     
-     // navigate('/user/otp')
+     //navigate('/user/otp')
     
      
     } else {
@@ -164,28 +159,31 @@ const Register = ({ setSubmitted }) => {
       //console.log(inputData);
     }
   };
-  const sendOtp = async () => {
-    if (email.current && email.current.value) {
-      const data = {
-        email: email.current.value,
-      };
-
-      try {
-        const response1 = await sentOtpFunction(data);
-
-        if (response1.status === 200) {
-          navigate("/user/register", { state: email.current.value });
-        } else {
-          console.log(data);
+  if (bool){
+    const sendOtp = async () => {
+      if (email.current && email.current.value) {
+        const data = {
+          email: email.current.value,
+        };
+    
+        try {
+          const response1 = await sentOtpFunction(data);
+    
+          if (response1.status === 200) {
+            navigate("/user/register", { state: email.current.value });
+          } else {
+            console.log(data);
+          }
+        } catch (error) {
+          console.error("Error sending OTP:", error);
         }
-      } catch (error) {
-        console.error("Error sending OTP:", error);
+      } else {
+        console.error("Email ref is null or email value is empty.");
       }
-    } else {
-      console.error("Email ref is null or email value is empty.");
-    }
-  };
-
+      
+    };
+    sendOtp();
+  }
    
 
 
