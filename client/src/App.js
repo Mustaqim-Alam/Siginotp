@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Otp from "./pages/Otp";
 import Error from "./pages/Error";
+import RegisterOtp from "./pages/registerOtp";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user/otp" element={<Otp />} />
+          <Route path="/user/register" element={<RegisterOtp />} />
           <Route path="*" element={<Error />} />
         </Routes>
       </div>

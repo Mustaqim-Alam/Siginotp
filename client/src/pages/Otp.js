@@ -1,15 +1,37 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import { userVerify } from "../services/Apis";
+import { sentOtpFunction } from "../services/Apis";
 
 const Otp = () => {
-  const [otp, setOtp] = useState("");
+   const location = useLocation();
+   
+   const {email} = location.state;
+console.log(location.state);
+  // // Sending OTP
+  // const sendOtp = async () => {
+  //   try {
+  //     const response = await sentOtpFunction(email);
+  //     if (response.status === 200) {
+  //       console.log("OTP sent successfully");
+  //     } else {
+  //       console.log("Failed to send OTP",email);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error while sending OTP:", error);
+  //   }
+  // };
 
-  const location = useLocation();
+  // // Call the sendOtp function when the component mounts
+  // useEffect(() => {
+  //   sendOtp();
+  // }, []); // Empty dependency array ensures this effect runs only once
+
+  const [otp, setOtp] = useState("");
   const navigate = useNavigate();
 
-  const LoginUser = async (e) => {
+  const loginUser = async (e) => {
     e.preventDefault();
 
     if (otp === "") {
@@ -20,22 +42,30 @@ const Otp = () => {
       toast.error("OTP Length should be minimum 6 digits");
     } else {
       const data = {
-        otp,
-        email: location.state,
+        otp:otp,
+       email:location.state
       };
 
-      const response = await userVerify(data);
-      if (response.status === 200) {
-        localStorage.setItem("userdbtoken", response.data.userToken);
-        toast.success(response.data.message);
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 5000);
-      } else {
-        toast.error(response.response.data.error);
+      try {
+        const response = await userVerify(data);
+        console.log("i am here");
+        // if (response.status === 200) {
+        //   localStorage.setItem("userdbtoken", response.data.userToken);
+        //   toast.success(response.data.message);
+        //   setTimeout(() => {
+        //     navigate("/dashboard");
+        //   }, 5000);
+        // } else {
+        //   toast.error(response.response.data.error);
+        //   console.log(response.response);
+        //   console.log(data);
+        // }
+      } catch (error) {
+        console.error("Error while verifying OTP:", error);
       }
     }
   };
+  
 
   return (
     <>
@@ -50,12 +80,11 @@ const Otp = () => {
               <input
                 type="text"
                 name="otp"
-                id=""
                 onChange={(e) => setOtp(e.target.value)}
                 placeholder="Enter Your OTP"
               />
             </div>
-            <button className="btn" onClick={LoginUser}>
+            <button className="btn" onClick={loginUser}>
               Submit
             </button>
           </form>

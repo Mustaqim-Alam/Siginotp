@@ -1,11 +1,13 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { registerfunction } from "../services/Apis";
-import { useNavigate } from "react-router-dom";
+import { sentOtpFunction } from "../services/Apis";
 import "../styles/mix.css";
 import CountryData from "./CountryData";
 
+import { useNavigate, useLocation } from "react-router-dom";
 const Register = ({ setSubmitted }) => {
+  const [bool,setBool]=useState(false)
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [nameError, setNameError] = useState("");
@@ -14,13 +16,21 @@ const Register = ({ setSubmitted }) => {
   const [courseError, setCourseError] = useState("");
   const [selectedCountryCode, setSelectedCountryCode] = useState("+91");
   const navigate = useNavigate();
+  const location = useLocation();
 
+  const emailFromState = location.state && location.state.email;
   const email = useRef();
   const phoneNo = useRef();
   const userName = useRef();
   const qualification = useRef();
   const graduation = useRef();
   const course = useRef();
+
+  useEffect(() => {
+    if (emailFromState) {
+      email.current.value = emailFromState;
+    }
+  }, [emailFromState]);
 
   const validateName = (name) => {
     if (!name.trim()) {
@@ -119,27 +129,62 @@ const Register = ({ setSubmitted }) => {
     ) {
       return;
     }
+  
 
     const inputData = {
-      name: userName.current.value,
-      email: email.current.value,
-      countryCode: selectedCountryCode,
+     fname: userName.current.value,
+     email : email.current.value,
+    dialCode: selectedCountryCode,
       phone: phoneNo.current.value,
-      qualification: qualification.current.value,
+      HighestQualification: qualification.current.value,
       course: course.current.value,
-      graduation: graduation.current.value,
+      Yog: graduation.current.value,
     };
 
-    const response = await registerfunction(inputData);
+     const response = await registerfunction(inputData);
 
     if (response.status === 200) {
-      setSubmitted(true);
+      //setSubmitted (true);
+      setBool(true)
       toast.success("Registration successful!");
-      navigate("/user/otp");
+    
+     // navigate('/user/otp')
+    
+     
     } else {
       toast.error(response.response.data.error);
+    //  console.log(response);
+      //console.log(inputData);
     }
   };
+
+  if(bool){
+    const sendotp = async () => {
+     // Check if email ref is null or not
+     if (email.current && email.current.value) {
+       const data = {
+         email: email.current.value
+       };
+   
+       try {
+         const response1 = await sentOtpFunction(data);
+         
+         if (response1.status === 200) {
+           navigate("/user/register", { state: email.current.value });
+         } else {
+           console.log(data);
+         }
+       } catch (error) {
+         console.error("Error sending OTP:", error);
+       }
+     } else {
+       console.error("Email ref is null or email value is empty.");
+     }
+   };
+   sendotp();
+   }
+   
+
 
   return (
     <>
@@ -189,6 +234,9 @@ const Register = ({ setSubmitted }) => {
                 {emailError}
               </p>
             )}
+             <p className="text-gray-300 font-sans text-sm">
+                You'll receive an OTP on this email for verification.
+              </p>
 
             <div className="flex flex-col w-96 my-2">
               <div className="flex justify-between gap-1">
@@ -224,9 +272,7 @@ const Register = ({ setSubmitted }) => {
                 <p className="text-red-500 self-start text-xs">{phoneError}</p>
               )}
 
-              <p className="text-gray-300 font-sans text-sm">
-                You'll receive an OTP on this number for verification.
-              </p>
+             
             </div>
             <div>
               <select

@@ -1,5 +1,5 @@
 const users = require("../models/userSchema");
-const userotp = require("../models/userOtp");
+const userotps = require("../models/userOtp");
 const nodemailer = require("nodemailer");
 
 
@@ -12,35 +12,46 @@ const tarnsporter = nodemailer.createTransport({
     }
 })
 
-
 exports.userregister = async (req, res) => {
-    const { fname, email, password } = req.body;
+    const {  fname,
+    email ,
+    dialCode,
+    phone,
+    course,
+    HighestQualification,
+    Yog} = req.body;
 
-    if (!fname || !email || !password) {
-        res.status(400).json({ error: "Please Enter All Input Data" })
+    if (!(fname && email &&  dialCode &&
+        phone &&
+        course &&
+        HighestQualification &&
+        Yog )) {
+        return res.status(400).json({ error: "Please Enter All Input Data" }); // Add return statement
     }
 
     try {
         const presuer = await users.findOne({ email: email });
 
         if (presuer) {
-            res.status(400).json({ error: "This User Allready exist in our db" })
+            return res.status(400).json({ error: "This User Already exists in our db" }); // Add return statement
         } else {
             const userregister = new users({
-                fname, email, password
+                fname, email, dialCode,
+                phone,
+                course,
+                HighestQualification,
+                Yog
             });
 
-            // here password hasing
+            // here password hashing
 
             const storeData = await userregister.save();
-            res.status(200).json(storeData);
+            return res.status(200).json(storeData); // Add return statement
         }
     } catch (error) {
-        res.status(400).json({ error: "Invalid Details", error })
+        return res.status(400).json({ error: "Invalid Details", error }); // Add return statement
     }
-
 };
-
 
 
 // user send otp
@@ -58,11 +69,11 @@ exports.userOtpSend = async (req, res) => {
         if (presuer) {
             const OTP = Math.floor(100000 + Math.random() * 900000);
 
-            const existEmail = await userotp.findOne({ email: email });
+            const existEmail = await userotps.findOne({ email: email });
 
 
             if (existEmail) {
-                const updateData = await userotp.findByIdAndUpdate({ _id: existEmail._id }, {
+                const updateData = await userotps.findByIdAndUpdate({ _id: existEmail._id }, {
                     otp: OTP
                 }, { new: true }
                 );
@@ -88,7 +99,7 @@ exports.userOtpSend = async (req, res) => {
 
             } else {
 
-                const saveOtpData = new userotp({
+                const saveOtpData = new userotps({
                     email, otp: OTP
                 });
 
@@ -119,27 +130,26 @@ exports.userOtpSend = async (req, res) => {
 };
 
 
-exports.userLogin = async(req,res)=>{
-    const {email,otp} = req.body;
+exports.userLogin = async (req, res) => {
+    const { email, otp } = req.body;
 
-    if(!otp || !email){
-        res.status(400).json({ error: "Please Enter Your OTP and email" })
+    if (!otp || !email) {
+        return res.status(400).json({ error: "Please Enter Your OTP and email" });
     }
 
     try {
-        const otpverification = await userotp.findOne({email:email});
+        const otpverification = await userotps.findOne({ email});
 
-        if(otpverification.otp === otp){
-            const preuser = await users.findOne({email:email});
+        if (otpverification.otp === otp) {
+            const preuser = await users.findOne({ email });
 
             // token generate
             const token = await preuser.generateAuthtoken();
-           res.status(200).json({message:"User Login Succesfully Done",userToken:token});
-
-        }else{
-            res.status(400).json({error:"Invalid Otp"})
+            return res.status(200).json({ message: "User Login Succesfully Done", userToken: token });
+        } else {
+            return res.status(400).json({ error: "Invalid Otp" });
         }
     } catch (error) {
-        res.status(400).json({ error: "Invalid Details", error })
+        return res.status(400).json({ error: "Invalid Details", error });
     }
-}
+};

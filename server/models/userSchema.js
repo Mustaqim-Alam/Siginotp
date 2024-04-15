@@ -20,31 +20,43 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
-    password: {
+    dialCode:{
+        type: String,
+        required: true
+        
+    },
+    phone: {
         type: String,
         required: true,
-        minlength: 6
+        minlength: 10
     },
-    tokens: [
-        {
-            token: {
-                type: String,
-                required: true,
-            }
-        }
-    ]
+    course: {
+        type: String,
+        enum:["Full Stack Web Development Program","Data Science","Artificial Intelligence","Others"],
+        default:"Full Stack Web Development Program",
+        required: true,
+       
+    },
+    HighestQualification: {
+        type: String,
+        enum:["B.Tech / BE / BCA","M.Tech / MCA","Graduate(Non-Technical)","Others"],
+        default:"other",
+        required: true,
+       
+    },
+    Yog: {
+        type: String,
+        enum:["After 2024","2024","2023","2022","2021","Before 2021"],
+        default:"After 2024",
+        required: true,
+       
+    },
+   
 });
 
 
 
 // hash password
-userSchema.pre("save", async function (next) {
-    if (this.isModified("password")) {
-        this.password = await bcrypt.hash(this.password, 12);
-    }
-
-    next();
-});
 
 // token generate
 userSchema.methods.generateAuthtoken = async function(){

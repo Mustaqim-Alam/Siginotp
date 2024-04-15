@@ -21,6 +21,6 @@ const userOtpSchema = new mongoose.Schema({
 
 
 // user otp model
-const userotp = new mongoose.model("userotps",userOtpSchema);
+const userotps = new mongoose.model("userotps",userOtpSchema);
 
-module.exports = userotp
+module.exports = userotps
