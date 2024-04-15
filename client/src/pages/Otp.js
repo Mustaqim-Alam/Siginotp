@@ -7,7 +7,7 @@ import { sentOtpFunction } from "../services/Apis";
 const Otp = () => {
    const location = useLocation();
    
-   const {email} = location.state;
+ 
 console.log(location.state);
   // // Sending OTP
   // const sendOtp = async () => {
@@ -49,17 +49,18 @@ console.log(location.state);
       try {
         const response = await userVerify(data);
         console.log("i am here");
-        // if (response.status === 200) {
-        //   localStorage.setItem("userdbtoken", response.data.userToken);
-        //   toast.success(response.data.message);
-        //   setTimeout(() => {
-        //     navigate("/dashboard");
-        //   }, 5000);
-        // } else {
-        //   toast.error(response.response.data.error);
-        //   console.log(response.response);
-        //   console.log(data);
-        // }
+        if (response.status === 200) {
+          localStorage.setItem("userdbtoken",response.data.userToken);
+          toast.success(response.data.message);
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 5000);
+        } else {
+          toast.error(response.response.data.error);
+          console.log(response.response);
+          console.log(data);
+        }
+       // navigate("/dashboard");
       } catch (error) {
         console.error("Error while verifying OTP:", error);
       }

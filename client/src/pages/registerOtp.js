@@ -6,7 +6,7 @@ import { userVerify } from "../services/Apis";
 const RegisterOtp = () => {
   const location = useLocation();
   //const email = location.state && location.state.email;
-  const email = location.state?.email ?? ''; // Fallback to empty string if email is not accessible
+  
 
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const RegisterOtp = () => {
     } else {
       const data = {
         otp,
-        email,
+        email:location.state,
       };
 
       try {

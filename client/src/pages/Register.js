@@ -30,6 +30,13 @@ const Register = ({ setSubmitted }) => {
     if (emailFromState) {
       email.current.value = emailFromState;
     }
+    sendOtp();
+  }, [emailFromState]); 
+
+  useEffect(() => {
+    if (emailFromState) {
+      email.current.value = emailFromState;
+    }
   }, [emailFromState]);
 
   const validateName = (name) => {
@@ -157,32 +164,28 @@ const Register = ({ setSubmitted }) => {
       //console.log(inputData);
     }
   };
+  const sendOtp = async () => {
+    if (email.current && email.current.value) {
+      const data = {
+        email: email.current.value,
+      };
 
-  if(bool){
-    const sendotp = async () => {
-     // Check if email ref is null or not
-     if (email.current && email.current.value) {
-       const data = {
-         email: email.current.value
-       };
-   
-       try {
-         const response1 = await sentOtpFunction(data);
-         
-         if (response1.status === 200) {
-           navigate("/user/register", { state: email.current.value });
-         } else {
-           console.log(data);
-         }
-       } catch (error) {
-         console.error("Error sending OTP:", error);
-       }
-     } else {
-       console.error("Email ref is null or email value is empty.");
-     }
-   };
-   sendotp();
-   }
+      try {
+        const response1 = await sentOtpFunction(data);
+
+        if (response1.status === 200) {
+          navigate("/user/register", { state: email.current.value });
+        } else {
+          console.log(data);
+        }
+      } catch (error) {
+        console.error("Error sending OTP:", error);
+      }
+    } else {
+      console.error("Email ref is null or email value is empty.");
+    }
+  };
+
    
 
 
@@ -227,7 +230,7 @@ const Register = ({ setSubmitted }) => {
               className={`w-96 p-2 rounded-lg my-2 border ${
                 emailError ? "border-red-500" : ""
               }`}
-              onBlur={(e) => validateEmail(e.target.value)}
+              onBlur={(e)=>validateEmail(e.target.value)}
             />
             {emailError && (
               <p className="text-red-500 self-start pl-6 text-xs">
